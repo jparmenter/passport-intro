@@ -9,7 +9,7 @@ module.exports = function(passport) {
   });
 
   passport.deserializeUser(function(id, done) {
-    User.findById(id, function(err, user) {
+    User.model.findById(id, function(err, user) {
       done(err, user);
     });
   });
@@ -24,14 +24,14 @@ module.exports = function(passport) {
 
     process.nextTick(function() {
 
-      User.findOne({ 'local.email' : email }, function(err, user) {
+      User.model.findOne({ 'local.email' : email }, function(err, user) {
         if (err)
           return done(err);
         if (user) {
           return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
         }
         else {
-          var newUser = new User();
+          var newUser = new User.model();
           newUser.local.email = email;
           newUser.local.password = newUser.generateHash(password);
 
@@ -51,7 +51,7 @@ module.exports = function(passport) {
     passReqToCallback : true
   },
   function(req, email, password, done) {
-    User.findOne({ 'local.email' : email }, function(err, user) {
+    User.model.findOne({ 'local.email' : email }, function(err, user) {
       if (err)
         return done(err);
 
