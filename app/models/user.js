@@ -84,7 +84,7 @@ var User = function() {
   var _registerFacebook = function(id, token, name, email, callback) {
     _findByFacebookId(id, function(err, user) {
       if (user) {
-        callback("Facebook email already registered");
+        callback("Facebook user already registered");
       }
       else {
         var newUser = new _model();
@@ -104,11 +104,42 @@ var User = function() {
     });
   }
 
+
+  // Twitter methods
+  var _findByTwitterId = function(id, callback) {
+    _model.findOne({ 'twitter.id' : id }, callback);
+  }
+
+  var _registerTwitter = function(id, token, username, displayName, callback) {
+    _findByTwitterId(id, function(err, user) {
+      if (user) {
+        callback("Twitter user already registered");
+      }
+      else {
+        var newUser = new _model();
+        newUser.twitter.id = id;
+        newUser.twitter.token = token;
+        newUser.twitter.username = username;
+        newUser.twitter.displayName = displayName;
+        newUser.save(function(err) {
+          if (err) {
+            callback(err, null);
+          }
+          else {
+            callback(null, newUser);
+          }
+        });
+      }
+    });
+  }
+
   return {
     registerLocal : _registerLocal,
     authenticateWithLocal : _authenticateWithLocal,
     findByFacebookId : _findByFacebookId,
     registerFacebook : _registerFacebook,
+    findByTwitterId : _findByTwitterId,
+    registerTwitter : _registerTwitter,
     schema : userSchema,
     model : _model,
   }
