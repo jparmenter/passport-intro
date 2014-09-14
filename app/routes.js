@@ -38,12 +38,21 @@ module.exports = function(app, passport) {
       successRedirect : '/profile',
       failureRedirect : '/'
     }));
-  
+
   // twitter routes
   app.get('/auth/twitter', passport.authenticate('twitter'));
 
   app.get('/auth/twitter/callback',
     passport.authenticate('twitter', {
+      successRedirect : '/profile',
+      failureRedirect : '/'
+    }));
+
+  // google routes
+  app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
+
+  app.get('/auth/google/callback',
+    passport.authenticate('google', {
       successRedirect : '/profile',
       failureRedirect : '/'
     }));

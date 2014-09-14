@@ -148,4 +148,46 @@ describe("Users", function() {
       })
     })
   });
+
+  describe("google", function() {
+    beforeEach(function(done) {
+      User.registerGoogle("1234", "xyz", "guser", "Google User", function(err, user) {
+        currentUser = user;
+        done();
+      });
+    });
+
+    describe("register", function() {
+      it("should create a user", function(done) {
+        User.registerGoogle("0001", currentUser.google.token, currentUser.google.email, currentUser.google.name, function(err, user) {
+          user.google.name.should.equal(currentUser.google.name);
+          done();
+        });
+      });
+
+      it("should have a unique id", function(done) {
+        User.registerGoogle(currentUser.google.id, currentUser.google.token, currentUser.google.email, currentUser.google.name, function(err, user) {
+          err.should.equal("Google user already registered");
+          // - expect(user).to.be.null; /undefined?
+          done();
+        });
+      });
+    });
+
+    describe("find by id", function() {
+      it("should find current user by id", function(done) {
+        User.findByGoogleId(currentUser.google.id, function(err, user) {
+          user.google.email.should.equal(currentUser.google.email);
+          done();
+        });
+      });
+
+      it("should not find a user id that doesn't exist", function(done) {
+        User.findByGoogleId("0001", function(err, user) {
+          expect(user).to.be.null;
+          done();
+        })
+      })
+    })
+  });
 });

@@ -133,6 +133,34 @@ var User = function() {
     });
   }
 
+  // Google methods
+  var _findByGoogleId = function(id, callback) {
+    _model.findOne({ 'google.id' : id }, callback);
+  }
+
+  var _registerGoogle = function(id, token, email, name, callback) {
+    _findByGoogleId(id, function(err, user) {
+      if (user) {
+        callback("Google user already registered");
+      }
+      else {
+        var newUser = new _model();
+        newUser.google.id = id;
+        newUser.google.token = token;
+        newUser.google.email = email;
+        newUser.google.name = name;
+        newUser.save(function(err) {
+          if (err) {
+            callback(err, null);
+          }
+          else {
+            callback(null, newUser);
+          }
+        });
+      }
+    });
+  }
+
   return {
     registerLocal : _registerLocal,
     authenticateWithLocal : _authenticateWithLocal,
@@ -140,6 +168,8 @@ var User = function() {
     registerFacebook : _registerFacebook,
     findByTwitterId : _findByTwitterId,
     registerTwitter : _registerTwitter,
+    findByGoogleId : _findByGoogleId,
+    registerGoogle : _registerGoogle,
     schema : userSchema,
     model : _model,
   }
