@@ -36,6 +36,7 @@ var User = function() {
 
   var _model = mongoose.model('User', userSchema);
 
+  // Local methods
   var _findByLocalEmail = function(email, callback) {
     _model.findOne({ 'local.email' : email }, callback);
   }
@@ -74,10 +75,40 @@ var User = function() {
       }
     });
   }
+
+  // Facebook methods
+  var _findByFacebookId = function(id, callback) {
+    _model.findOne({ 'facebook.id' : id }, callback);
+  }
+
+  var _registerFacebook = function(id, token, name, email, callback) {
+    _findByFacebookId(id, function(err, user) {
+      if (user) {
+        callback("Facebook email already registered");
+      }
+      else {
+        var newUser = new _model();
+        newUser.facebook.id = id;
+        newUser.facebook.token = token;
+        newUser.facebook.name = name;
+        newUser.facebook.email = email;
+        newUser.save(function(err) {
+          if (err) {
+            callback(err, null);
+          }
+          else {
+            callback(null, newUser);
+          }
+        });
+      }
+    });
+  }
+
   return {
     registerLocal : _registerLocal,
     authenticateWithLocal : _authenticateWithLocal,
-    findByLocalEmail : _findByLocalEmail,
+    findByFacebookId : _findByFacebookId,
+    registerFacebook : _registerFacebook,
     schema : userSchema,
     model : _model,
   }

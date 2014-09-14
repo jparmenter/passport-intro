@@ -7,20 +7,21 @@ mongoose.connect("mongodb://localhost/passport-intro_test");
 describe("Users", function() {
 
   var currentUser = null;
-  beforeEach(function(done) {
-    User.registerLocal("test@test.com", "password", function(err, user) {
-      currentUser = user;
-      done();
-    });
-  });
-
-  afterEach(function(done) {
-    User.model.remove({}, function() {
-      done();
-    });
-  });
 
   describe("local", function() {
+    beforeEach(function(done) {
+      User.registerLocal("test@test.com", "password", function(err, user) {
+        currentUser = user;
+        done();
+      });
+    });
+
+    afterEach(function(done) {
+      User.model.remove({}, function() {
+        done();
+      });
+    });
+
     describe("register", function() {
       it("should create a new user", function(done) {
         User.registerLocal("test2@test.com", "password", function(err, user) {
@@ -37,23 +38,6 @@ describe("Users", function() {
         });
       });
 
-    });
-
-    describe("find by email", function() {
-      it("should find our currentUser", function(done) {
-        User.findByLocalEmail("test@test.com", function(err, user) {
-          expect(user.local.email).equal(currentUser.local.email);
-          done();
-        });
-      });
-
-      it("should not find a user that does not exist", function(done) {
-        User.findByLocalEmail("test3@test.com", function(err, user) {
-          expect(user).to.be.null;
-          expect(err).to.be.null;
-          done();
-        })
-      });
     });
 
     describe("authenticate", function() {
@@ -78,6 +62,52 @@ describe("Users", function() {
           expect(user).to.be.null;
           expect(err).to.equal("Oops! wrong password");
           done();
+        });
+      });
+    });
+  });
+
+  describe("facebook", function() {
+    beforeEach(function(done) {
+      User.registerFacebook("1234", "token001", "Joe Doe", "facebook@test.com", function(err, user) {
+        currentUser = user.facebook;
+        done();
+      });
+    });
+
+    afterEach(function(done) {
+      User.model.remove({}, function() {
+        done();
+      });
+    });
+
+    describe("register", function() {
+      it("should create a new user", function(done) {
+        User.registerFacebook("1235", currentUser.token, currentUser.token, currentUser.token.email, function(err, user) {
+          user.should.exist;
+          done();
+        });
+      });
+
+      it("should not create a new user", function(done) {
+        User.registerFacebook("1234", "token555", "Bob Doe", "bobdoe@test.com", function(err, user) {
+          err.should.equal("Facebook email already registered");
+          done();
+        });
+      });
+    });
+
+    describe("findByFacebookId", function() {
+      it("should return a user", function(done) {
+        User.findByFacebookId(currentUser.id, function(err, user) {
+          user.facebook.id.should.equal(currentUser.id);
+          done();
+        });
+      });
+
+      it("should id is not found", function() {
+        User.findByFacebookId("0000", function(err, user) {
+          expect(user).to.be.null;
         });
       });
     });
