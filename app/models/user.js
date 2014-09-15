@@ -76,6 +76,14 @@ var User = function() {
     });
   }
 
+  var _clearLocal = function(user, callback) {
+    user.local.email = undefined;
+    user.local.password = undefined;
+    user.save(function(err) {
+      callback(err);
+    });
+  }
+
   // Facebook methods
   var _findByFacebookId = function(id, callback) {
     _model.findOne({ 'facebook.id' : id }, callback);
@@ -104,6 +112,32 @@ var User = function() {
     });
   }
 
+  var _addFacebookToUser = function(user, id, token, name, email, callback) {
+    if (!user) {
+      callback("Need a user");
+    }
+    else {
+      user.facebook.id =id;
+      user.facebook.token = token;
+      user.facebook.name = name;
+      user.facebook.email = email;
+      user.save(function(err) {
+        if (err) {
+          throw err;
+        }
+        else {
+          callback(null, user);
+        }
+      });
+    }
+  }
+
+  var _clearFacebook = function(user, callback) {
+    user.facebook.token = undefined;
+    user.save(function(err) {
+      callback(err);
+    });
+  }
 
   // Twitter methods
   var _findByTwitterId = function(id, callback) {
@@ -130,6 +164,33 @@ var User = function() {
           }
         });
       }
+    });
+  }
+
+  var _addTwitterToUser = function(user, id, token, username, displayName, callback) {
+    if (!user) {
+      callback("Need a user");
+    }
+    else {
+      user.twitter.id =id;
+      user.twitter.token = token;
+      user.twitter.username = username;
+      user.twitter.displayName = displayName;
+      user.save(function(err) {
+        if (err) {
+          throw err;
+        }
+        else {
+          callback(null, user);
+        }
+      });
+    }
+  }
+
+  var _clearTwitter = function(user, callback) {
+    user.twitter.token = undefined;
+    user.save(function(err) {
+      callback(err);
     });
   }
 
@@ -161,15 +222,49 @@ var User = function() {
     });
   }
 
+  var _addGoogleToUser = function(user, id, token, email, name, callback) {
+    if (!user) {
+      callback("Need a user");
+    }
+    else {
+      user.google.id =id;
+      user.google.token = token;
+      user.google.name = name;
+      user.google.email = email;
+      user.save(function(err) {
+        if (err) {
+          throw err;
+        }
+        else {
+          callback(null, user);
+        }
+      });
+    }
+  }
+
+  var _clearGoogle = function(user, callback) {
+    user.google.token = undefined;
+    user.save(function(err) {
+      callback(err);
+    });
+  }
+
   return {
     registerLocal : _registerLocal,
     authenticateWithLocal : _authenticateWithLocal,
+    clearLocal : _clearLocal,
     findByFacebookId : _findByFacebookId,
     registerFacebook : _registerFacebook,
+    clearFacebook : _clearFacebook,
+    addFacebookToUser : _addFacebookToUser,
     findByTwitterId : _findByTwitterId,
     registerTwitter : _registerTwitter,
+    addTwitterToUser : _addTwitterToUser,
+    clearTwitter : _clearTwitter,
     findByGoogleId : _findByGoogleId,
     registerGoogle : _registerGoogle,
+    addGoogleToUser : _addGoogleToUser,
+    clearGoogle : _clearGoogle,
     schema : userSchema,
     model : _model,
   }
