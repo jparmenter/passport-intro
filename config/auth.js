@@ -14,6 +14,6 @@ module.exports = {
   'googleAuth' : {
     'clientID' : settings.gClientId,
     'clientSecret' : settings.gClientSecret,
-    'callbackURL' : 'http//localhost:3000/auth/google/callback'
+    'callbackURL' : 'http://localhost:3000/auth/google/callback'
   }
 }

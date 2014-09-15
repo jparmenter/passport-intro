@@ -123,7 +123,7 @@ module.exports = function(passport) {
           return done(null, user);
         }
         else {
-          User.registerGoogle(profile.id, token, profile.email[0].value, profile.displayName, function(err, user) {
+          User.registerGoogle(profile.id, token, profile.emails[0].value, profile.displayName, function(err, newUser) {
             if (err) {
               throw err;
             }
