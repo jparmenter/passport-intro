@@ -2,7 +2,12 @@ var User = require('../app/models/user');
 
 module.exports = function(app, passport) {
 
-  app.get('/', function(req, res) {
+  app.get('/', function(req, res, next) {
+    if (!req.isAuthenticated())
+      return next();
+    res.redirect('/profile');
+  },
+  function(req, res) {
     res.render('pages/index.ejs');
   });
 
